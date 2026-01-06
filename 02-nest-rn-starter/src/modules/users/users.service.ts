@@ -6,6 +6,8 @@ import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { hashPasswordHelper } from '@/helper/utils';
 import aqp from 'api-query-params';
+import mongoose from 'mongoose';
+
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
@@ -42,6 +44,7 @@ export class UsersService {
       address,
       image,
     });
+
     return {
       _id: user._id,
     };
@@ -74,11 +77,23 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    return await this.userModel.updateOne(
+      { _id: updateUserDto._id },
+      { ...updateUserDto },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    if (mongoose.isValidObjectId(id)) {
+      //sử dụng mongoose để kiểm tra id hợp lệ
+      return this.userModel.deleteOne({ _id: id });
+    } else {
+      throw new BadRequestException(`Id không hợp lệ`);
+    }
+  }
+
+  async findByEmail(email: string) {
+    return await this.userModel.findOne({ email });
   }
 }
