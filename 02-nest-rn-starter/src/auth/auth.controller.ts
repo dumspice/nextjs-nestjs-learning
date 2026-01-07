@@ -42,7 +42,11 @@ export class AuthController {
       to: 'dzunghoang04@gmail.com', // list of receivers
       subject: 'Testing Nest MailerModule ✔', // Subject line
       text: 'welcome', // plaintext body
-      html: '<b>hello world</b>', // HTML body content
+      template: 'register',
+      context: {
+        name: 'Dum',
+        activationCode: 123123123,
+      },
     });
     return 'hello world';
   }
