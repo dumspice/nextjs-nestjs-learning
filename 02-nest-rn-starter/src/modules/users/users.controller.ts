@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '@/auth/passport/jwt-auth.guard';
+import { Public } from '@/decorator/customize';
 
 @Controller('users')
 export class UsersController {
@@ -23,6 +26,7 @@ export class UsersController {
   }
 
   @Get()
+  @Public()
   async findAll(
     @Query() query: string,
     @Query('current') current: string,

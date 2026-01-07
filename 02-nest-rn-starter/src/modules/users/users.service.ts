@@ -7,6 +7,9 @@ import { Model } from 'mongoose';
 import { hashPasswordHelper } from '@/helper/utils';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class UsersService {
@@ -95,5 +98,35 @@ export class UsersService {
 
   async findByEmail(email: string) {
     return await this.userModel.findOne({ email });
+  }
+
+  async handleRegister(registerDto: CreateAuthDto) {
+    const { name, email, password } = registerDto;
+
+    //check user exist
+    const isExist = await this.isEmailExist(email);
+    if (isExist) {
+      throw new BadRequestException(
+        `Email đã tồn tại: ${email}. Vui lòng sử dụng email khác!`,
+      );
+    }
+
+    //hash password
+    const hashPassword = await hashPasswordHelper(registerDto.password);
+
+    const user = await this.userModel.create({
+      name,
+      email,
+      password: hashPassword,
+      isActive: false,
+      codeId: uuidv4(),
+      codeExpired: dayjs().add(1, 'minutes'),
+    });
+
+    // return response
+    return {
+      _id: user._id,
+    };
+    // send email
   }
 }
