@@ -19,4 +19,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   image: string;
+
+  @IsOptional()
+  isActive: boolean;
 }
